@@ -1,2 +1,2 @@
 # distdecay
-R package for analysis distance decay functions
+R package for analysis of distance decay functions
