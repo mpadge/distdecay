@@ -1,0 +1,35 @@
+language: r
+warnings_are_errors: true
+sudo: false
+cache: packages
+
+matrix:
+    allow_failures: # temporarily enabled. TODO: disable
+        -os: osx
+    include:
+        - os: linux
+          r: release
+          dist: trusty # 14.04
+          env: R_CODECOV=true
+        - os: linux
+          r: devel
+          dist: trusty
+        - os: osx
+          r: release
+          before_install: ''
+          disable_homebrew: true
+        - os: osx
+          r: devel
+          before_install: ''
+          disable_homebrew: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+r_github_packages:
+      - jimhester/covr
+
+after_success:
+      - Rscript -e 'covr::codecov()'
