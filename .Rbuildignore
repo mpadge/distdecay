@@ -1,0 +1,10 @@
+^aaa\.Rmd$
+^appveyor\.yml$
+^makefile$
+^.*\.Rproj$
+^README\.Rmd$
+^README\.md$
+^README\.html$
+^\.travis\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
