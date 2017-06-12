@@ -1,5 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Build Status](https://travis-ci.org/mpadge/distdecay?branch=master)](https://travis-ci.org/mpadge/distdecay) [![Build status](https://ci.appveyor.com/api/projects/status/github/mpadge/distdecay?svg=true)](https://ci.appveyor.com/project/mpadge/distdecay) [![codecov](https://codecov.io/gh/mpadge/distdecay/branch/master/graph/badge.svg)](https://codecov.io/gh/mpadge/distdecay) [![Project Status: WIP](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#WIP)
+[![Build Status](https://travis-ci.org/mpadge/distdecay.svg?branch=master)](https://travis-ci.org/mpadge/distdecay) [![Build status](https://ci.appveyor.com/api/projects/status/github/mpadge/distdecay?svg=true)](https://ci.appveyor.com/project/mpadge/distdecay) [![codecov](https://codecov.io/gh/mpadge/distdecay/branch/master/graph/badge.svg)](https://codecov.io/gh/mpadge/distdecay) [![Project Status: WIP](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#WIP)
 
 An R package for analysis of distance decay functions.
 
