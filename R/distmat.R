@@ -29,6 +29,7 @@ distmat <-  function (xy, dmat, g_units = "metric", g_mode = "bicycling")
     nmax <- 30 # maximal number of distances per request; approx <= 37
     gr_indx <- group_index (seq (nst), nmax = nmax)
 
+    # Getting google responses is the slowest bit by miles, so loops okay here
     pb <- txtProgressBar (max = 1, style = 3)
     for (i in seq (nst))
     {
@@ -46,9 +47,12 @@ distmat <-  function (xy, dmat, g_units = "metric", g_mode = "bicycling")
                 url <- utils::URLencode(url_travel, repeated = FALSE,
                                         reserved = FALSE)
                 obj <- jsonlite::fromJSON(url)
-                dists <- obj$rows$elements [[1]]$distance$value
-                if (length (dists) > 0)
-                    dmat [i, gr_indx [[j]] ] <- dists
+                if (obj$status == "OK")
+                {
+                    dists <- obj$rows$elements [[1]]$distance$value
+                    if (length (dists) > 0)
+                        dmat [i, gr_indx [[j]] ] <- dists
+                }
             }
         }
         setTxtProgressBar(pb, i / nst)
