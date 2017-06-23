@@ -3,7 +3,7 @@
 
 An R package for analysis of distance decay functions.
 
-Input: One square matrix of relationships between pairs of locations; one squre matrix of corresponding distances.
+Input: Two square matrices; one of relationships between pairs of locations and one of corresponding distances.
 
 Output: Distance decay functions for each location, quantified as either covariance or mutual information coefficients.
 
