@@ -10,6 +10,8 @@ Depends:
 License: GPL-3
 NeedsCompilation: no
 LazyData: true
+Imports:
+    jsonlite
 Suggests:
     devtools,
     knitr,

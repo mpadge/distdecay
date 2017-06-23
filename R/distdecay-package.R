@@ -11,5 +11,6 @@
 #' @name distdecay
 #' @docType package
 #' @author Mark Padgham
-#' @importFrom stats runif
+#' @importFrom jsonlite fromJSON
+#' @importFrom utils setTxtProgressBar txtProgressBar
 NULL
