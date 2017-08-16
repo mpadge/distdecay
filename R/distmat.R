@@ -1,4 +1,4 @@
-#' distmat
+#' distmat_g
 #'
 #' Calculate distance matrix between pairs of points using the google API
 #'
@@ -17,7 +17,7 @@
 #' \dontrun{
 #' test_fn ()
 #' }
-distmat <-  function (xy, dmat, g_units = "metric", g_mode = "bicycling")
+distmat_g <-  function (xy, dmat, g_units = "metric", g_mode = "bicycling")
 {
     base_url <- paste0 ("https://maps.googleapis.com/maps/api/",
                         "distancematrix/json?units=", g_units)
