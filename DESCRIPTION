@@ -11,13 +11,15 @@ License: GPL-3
 NeedsCompilation: no
 LazyData: true
 Imports:
-    jsonlite
+    bikedata
 Suggests:
     devtools,
     knitr,
     rmarkdown,
     roxygen2,
     testthat
+Remotes:
+    ropensci/bikedata
 URL: https://github.com/mpadge/distdecay
 BugReports: https://github.com/mpadge/distdecay/issues
 Encoding: UTF-8
