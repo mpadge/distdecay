@@ -1,5 +1,29 @@
-#' distmat_g
+#' dd_get_distmat
 #'
+#' Load pre-calculated distance matrix for a given city
+#'
+#' @param city City for which distance matrix is to be extracted
+#'
+#' @note The directory from which distance matrices are loaded can be retrieveed
+#' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
+#'
+#' @export
+dd_get_distmat <- function (city)
+{
+    ci <- convert_city_name (city)
+
+    files <- list.files (dd_get_data_dir ())
+    f <- file.path (dd_get_data_dir (), files [grepl ("dist", files)])
+    load (f)
+    obj <- ls () [grep ("distmat", ls ())]
+    
+    if (!ci %in% names (get (obj)))
+        stop (city, " not in distance matrix data")
+
+    get (obj)[[ci]]
+}
+
+
 #' Calculate distance matrix between pairs of points using the google API
 #'
 #' @param xy A two-column matrix of lon-lat coordinates

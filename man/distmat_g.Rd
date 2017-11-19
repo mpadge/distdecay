@@ -2,7 +2,7 @@
 % Please edit documentation in R/distmat.R
 \name{distmat_g}
 \alias{distmat_g}
-\title{distmat_g}
+\title{Calculate distance matrix between pairs of points using the google API}
 \usage{
 distmat_g(xy, dmat, g_units = "metric", g_mode = "bicycling")
 }
