@@ -23,6 +23,31 @@ dd_get_distmat <- function (city)
     get (obj)[[ci]]
 }
 
+#' dd_get_tripmat
+#'
+#' Load pre-calculated trip matrix for a given city
+#'
+#' @param city City for which trip matrix is to be extracted
+#'
+#' @note The directory from which trip matrices are loaded can be retrieveed
+#' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
+#'
+#' @export
+dd_get_tripmat <- function (city)
+{
+    ci <- convert_city_name (city)
+
+    files <- list.files (dd_get_data_dir ())
+    f <- file.path (dd_get_data_dir (), files [grepl ("trip", files)])
+    load (f)
+    obj <- ls () [grep ("tripmat", ls ())]
+    
+    if (!ci %in% names (get (obj)))
+        stop (city, " not in trip matrix data")
+
+    get (obj)[[ci]]
+}
+
 
 #' Calculate distance matrix between pairs of points using the google API
 #'

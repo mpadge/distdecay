@@ -2,6 +2,7 @@
 
 export(dd_get_data_dir)
 export(dd_get_distmat)
+export(dd_get_tripmat)
 export(dd_set_data_dir)
 export(distmat_g)
 importFrom(jsonlite,fromJSON)
