@@ -10,14 +10,29 @@
 #' cov function doesn't ignore zeros, and any nan or inf values generate
 #' resultant NA covariances for the whole row.
 #' 
-#' @export
+#' @noRd
 rcpp_calc_cov <- function(tmat) {
     .Call(`_distdecay_rcpp_calc_cov`, tmat)
 }
 
-#' test
+#' rcpp_calc_mi
+#'
+#' Calculate pairwise Mutual Information matrix between input trip matrix.
+#' Upper diagonal is between all trips **from** i and j; lower diagonal holds
+#' covariances between all trips **to** j and i. The zero values can simply be
+#' ignored here because all marginal and joint distributions are normalised by
+#' total sums, which are unaffected by zeros.
+#' 
+#' In R terms, NI between x and y is calculated from
+#' pxy <- cbind (x, y) / sum (x + y) # joint density
+#' px <- rowSums (pxy) # marginal densities
+#' py <- colSums (pxy)
+#' fnull <- px %o% py # independent null model
+#' xy <- ifelse (pxy > 0, log2 (pxy / fnull), 0)
+#' mi <- sum (pxy * xy)
+#' 
 #' @noRd
-test <- function() {
-    .Call(`_distdecay_test`)
+rcpp_calc_mi <- function(tmat) {
+    .Call(`_distdecay_rcpp_calc_mi`, tmat)
 }
 

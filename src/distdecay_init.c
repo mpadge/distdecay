@@ -9,11 +9,11 @@
 
 /* .Call calls */
 extern SEXP _distdecay_rcpp_calc_cov(SEXP);
-extern SEXP _distdecay_test();
+extern SEXP _distdecay_rcpp_calc_mi(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_distdecay_rcpp_calc_cov", (DL_FUNC) &_distdecay_rcpp_calc_cov, 1},
-    {"_distdecay_test",          (DL_FUNC) &_distdecay_test,          0},
+    {"_distdecay_rcpp_calc_mi",  (DL_FUNC) &_distdecay_rcpp_calc_mi,  1},
     {NULL, NULL, 0}
 };
 

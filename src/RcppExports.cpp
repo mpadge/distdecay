@@ -17,13 +17,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// test
-int test();
-RcppExport SEXP _distdecay_test() {
+// rcpp_calc_mi
+Rcpp::NumericMatrix rcpp_calc_mi(arma::mat tmat);
+RcppExport SEXP _distdecay_rcpp_calc_mi(SEXP tmatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(test());
+    Rcpp::traits::input_parameter< arma::mat >::type tmat(tmatSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_calc_mi(tmat));
     return rcpp_result_gen;
 END_RCPP
 }

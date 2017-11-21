@@ -17,9 +17,3 @@
 
 constexpr int INFINITE_INT =  std::numeric_limits<int>::max ();
 constexpr double INFINITE_DOUBLE =  std::numeric_limits<double>::max ();
-
-struct RegrResults {
-    double r2, cov, slope, intercept, SS, tval;      };
-
-RegrResults regression (std::vector <double> x, std::vector <double> y);
-double calcMI (std::vector <double> x, std::vector <double> y);
