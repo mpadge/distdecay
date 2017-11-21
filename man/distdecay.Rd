@@ -4,12 +4,14 @@
 \name{distdecay}
 \alias{distdecay}
 \alias{distdecay-package}
-\title{Calcalate distance decay functions based on (dis)similarity matrices}
+\title{distdecay}
 \description{
-Input: One square matrix of (dis-)similarities between pairs of locations; one
-squre matrix of corresponding distances.
+Calcalate distance decay functions based on (dis)similarity matrices
 }
 \details{
+Input: One square matrix of (dis-)similarities between pairs of locations; one
+squre matrix of corresponding distances.
+
 Output: Distance decay functions for each location, quantified as either
 covariance or mutual information coefficients.
 }

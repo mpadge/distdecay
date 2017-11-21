@@ -1,3 +1,5 @@
+#' distdecay
+#'
 #' Calcalate distance decay functions based on (dis)similarity matrices
 #'
 #' Input: One square matrix of (dis-)similarities between pairs of locations; one
@@ -10,4 +12,6 @@
 #' @docType package
 #' @author Mark Padgham
 #' @importFrom bikedata bike_match_matrices
+#' @importFrom Rcpp evalCpp
+#' @useDynLib distdecay, .registration = TRUE
 NULL

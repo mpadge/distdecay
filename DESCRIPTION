@@ -8,10 +8,10 @@ Description: Calculate distance decay functions.
 Depends:
     R (>= 3.2.4)
 License: GPL-3
-NeedsCompilation: no
-LazyData: true
 Imports:
-    bikedata
+    bikedata,
+    Rcpp (>= 0.12.6),
+    RcppArmadillo
 Suggests:
     devtools,
     knitr,
@@ -20,8 +20,15 @@ Suggests:
     testthat
 Remotes:
     ropensci/bikedata
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
+SystemRequirements:
+    C++11,
 URL: https://github.com/mpadge/distdecay
 BugReports: https://github.com/mpadge/distdecay/issues
 Encoding: UTF-8
+NeedsCompilation: yes
+LazyData: true
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
