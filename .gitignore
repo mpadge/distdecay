@@ -2,3 +2,7 @@ aaa.Rmd
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+# vim files
+.*.un~
+.*.swp
