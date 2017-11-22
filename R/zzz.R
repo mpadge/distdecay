@@ -1,7 +1,9 @@
 .onLoad <- function (libname, pkgname)
 {
+    data_dir <- file.path ("data", "data", "bikes")
+    data_dir <- paste0 (.Platform$file.sep, data_dir, .Platform$file.sep)
     op <- options ()
-    op.distdecay <- list (data_dir = file.path ("data", "data", "bikes"))
+    op.distdecay <- list (data_dir = data_dir)
     toset <- !(names (op.distdecay) %in% names (op))
     if (any (toset))
         options (op.distdecay [toset])
