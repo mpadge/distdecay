@@ -12,6 +12,7 @@
 #' @docType package
 #' @author Mark Padgham
 #' @importFrom bikedata bike_match_matrices
+#' @importFrom jsonlite fromJSON
 #' @importFrom Rcpp evalCpp
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
