@@ -13,5 +13,6 @@
 #' @author Mark Padgham
 #' @importFrom bikedata bike_match_matrices
 #' @importFrom Rcpp evalCpp
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
 NULL
