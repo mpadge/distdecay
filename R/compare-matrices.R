@@ -15,13 +15,8 @@
 #' @export
 dd_cov <- function (city)
 {
-    dm <- dd_get_distmat (city)
-    tm <- dd_get_tripmat (city)
-    mats <- bikedata::bike_match_matrices (dm, tm)
-    dm <- mats$dist
-    tm <- mats$trip
-
-    cmat <- rcpp_calc_cov (tm)
+    mats <- dd_get_tripdistmats (city)
+    cmat <- rcpp_calc_cov (mats$trip)
     rownames (cmat) <- rownames (tm)
     colnames (cmat) <- colnames (tm)
     cmat [!is.finite (cmat)] <- NA
@@ -45,11 +40,8 @@ dd_cov <- function (city)
 #' @export
 dd_mi <- function (city)
 {
-    dm <- dd_get_distmat (city)
-    tm <- dd_get_tripmat (city)
-    mats <- bikedata::bike_match_matrices (dm, tm)
-    dm <- mats$dist
-    tm <- mats$trip
+    mats <- dd_get_tripdistmats (city)
+    cmat <- rcpp_calc_mi (mats$trip)
 
     mmat <- rcpp_calc_mi (tm)
     rownames (mmat) <- rownames (tm)
@@ -57,4 +49,3 @@ dd_mi <- function (city)
     mmat [!is.finite (mmat)] <- NA
     return (mmat)
 }
-

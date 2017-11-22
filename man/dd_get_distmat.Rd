@@ -9,6 +9,10 @@ dd_get_distmat(city)
 \arguments{
 \item{city}{City for which distance matrix is to be extracted}
 }
+\value{
+Square matrix of distances between all stations for nominated
+city.
+}
 \description{
 Load pre-calculated distance matrix for a given city
 }

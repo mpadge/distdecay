@@ -3,6 +3,8 @@
 #' Load pre-calculated distance matrix for a given city
 #'
 #' @param city City for which distance matrix is to be extracted
+#' @return Square matrix of distances between all stations for nominated
+#' city.
 #'
 #' @note The directory from which distance matrices are loaded can be retrieveed
 #' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
@@ -16,7 +18,7 @@ dd_get_distmat <- function (city)
     f <- file.path (dd_get_data_dir (), files [grepl ("dist", files)])
     load (f)
     obj <- ls () [grep ("distmat", ls ())]
-    
+
     if (!ci %in% names (get (obj)))
         stop (city, " not in distance matrix data")
 
@@ -28,6 +30,8 @@ dd_get_distmat <- function (city)
 #' Load pre-calculated trip matrix for a given city
 #'
 #' @param city City for which trip matrix is to be extracted
+#' @return Square matrix of numbers of trips between all stations for nominated
+#' city.
 #'
 #' @note The directory from which trip matrices are loaded can be retrieveed
 #' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
@@ -41,11 +45,31 @@ dd_get_tripmat <- function (city)
     f <- file.path (dd_get_data_dir (), files [grepl ("trip", files)])
     load (f)
     obj <- ls () [grep ("tripmat", ls ())]
-    
+
     if (!ci %in% names (get (obj)))
         stop (city, " not in trip matrix data")
 
     get (obj)[[ci]]
+}
+
+#' dd_get_tripdistsmatS
+#'
+#' Load pre-calcualted trip \strong{and} distance matrices for a given city,
+#' ensuring that all row and column names match.
+#'
+#' @param city City for which matrices are to be extracted
+#' @return List of two square matrices of (i) numbers of trips (\code{$trip})
+#' and (ii) distances (\code{$dist}) between all stations for nominated city.
+#'
+#' @note The directory from which trip matrices are loaded can be retrieveed
+#' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
+#'
+#' @export
+dd_get_tripdistmats <- function (city)
+{
+    tm <- dd_get_tripmat (city)
+    dm <- dd_get_distmat (city)
+    bikedata::bike_match_matrices (dm, tm)
 }
 
 

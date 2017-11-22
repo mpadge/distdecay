@@ -9,6 +9,10 @@ dd_get_tripmat(city)
 \arguments{
 \item{city}{City for which trip matrix is to be extracted}
 }
+\value{
+Square matrix of numbers of trips between all stations for nominated
+city.
+}
 \description{
 Load pre-calculated trip matrix for a given city
 }
