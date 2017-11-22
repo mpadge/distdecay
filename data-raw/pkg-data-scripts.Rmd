@@ -1,0 +1,19 @@
+# scrips to generate test data
+
+```{r load, echo = FALSE}
+m <- array (1:100, dim = c (10, 10))
+rownames (m) <- colnames (m) <- paste0 (1:10)
+tm <- dm <- m
+attr (tm, "variable") <- "numtrips"
+attr (dm, "variable") <- "distance"
+
+tripmats <- list (la = tm)
+fname <- system.file ('extdata', 'tripmats.rda', package = 'distdecay')
+#fname <- file.path (getwd(), "inst", "extdata", "tripmats.rda")
+save (tripmats, file = fname)
+
+distmats <- list (la = dm)
+fname <- system.file ('extdata', 'distmats.rda', package = 'distdecay')
+#fname <- file.path (getwd(), "inst", "extdata", "distmats.rda")
+save (distmats, file = fname)
+```

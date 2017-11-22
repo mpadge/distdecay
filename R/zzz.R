@@ -1,7 +1,7 @@
 .onLoad <- function (libname, pkgname)
 {
     op <- options ()
-    op.distdecay <- list (data_dir = '/data/data/bikes/')
+    op.distdecay <- list (data_dir = file.path ("data", "data", "bikes"))
     toset <- !(names (op.distdecay) %in% names (op))
     if (any (toset))
         options (op.distdecay [toset])
