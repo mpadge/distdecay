@@ -42,6 +42,7 @@ dd_plot <- function (city, from = TRUE, mi = FALSE, smoother = TRUE)
 
     dat <- data.frame (x = d, y = m)
 
+    x <- y <- ..count.. <- NULL # suppress R CMD check messges
     g <- ggplot2::ggplot (dat, ggplot2::aes (x = x, y = y)) +
         ggplot2::stat_binhex (ggplot2::aes (fill = log (..count..)))#nolint
     if (smoother)
@@ -122,6 +123,7 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
     dat <- data.frame (x = d, y = m, city = ci)
     message ("done\nThere are a total of ", nrow (dat), " data points")
 
+    x <- y <- ..count.. <- NULL # suppress R CMD check messges
     g <- ggplot2::ggplot (dat, ggplot2::aes (x = x, y = y)) +
         ggplot2::stat_binhex (ggplot2::aes (fill = log (..count..)))#nolint
     if (smoother)

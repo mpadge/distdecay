@@ -12,6 +12,9 @@
 #' @docType package
 #' @author Mark Padgham
 #' @importFrom bikedata bike_match_matrices
+#' @importFrom ggplot2 facet_wrap geom_smooth ggplot guides 
+#' @importFrom ggplot2 scale_fill_gradientn scale_x_log10 scale_y_log10 
+#' @importFrom ggplot2 stat_binhex xlab ylab 
 #' @importFrom jsonlite fromJSON
 #' @importFrom Rcpp evalCpp
 #' @importFrom utils txtProgressBar setTxtProgressBar

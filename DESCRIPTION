@@ -10,6 +10,7 @@ Depends:
 License: GPL-3
 Imports:
     bikedata,
+    ggplot2,
     jsonlite,
     Rcpp (>= 0.12.6),
     RcppArmadillo
