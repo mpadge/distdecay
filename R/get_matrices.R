@@ -73,6 +73,35 @@ dd_get_tripdistmats <- function (city)
 }
 
 
+#' dd_get_vecs
+#'
+#' Get data.frame of distances (\code{d}) and numbers of trips (\code{n}) for a
+#' given city
+#' @noRd
+dd_get_vecs <- function (city, from = TRUE, mi = FALSE)
+{
+    if (mi)
+        n <- dd_mi (city)
+    else
+        n <- dd_cov (city)
+    d <- dd_get_distmat (city)
+
+    if (from)
+    {
+        d <- d [lower.tri (d)]
+        n <- n [lower.tri (n)]
+    } else
+    {
+        d <- d [upper.tri (d)]
+        n <- n [upper.tri (n)]
+    }
+
+    indx <- which (!is.na (n) & !is.na (d) & n > 0)
+    if (length (indx) == 0)
+        stop ("No or insufficient data available for ", city)
+    data.frame (d = d [indx], n = n [indx])
+}
+
 #' Calculate distance matrix between pairs of points using the google API
 #'
 #' @param xy A two-column matrix of lon-lat coordinates

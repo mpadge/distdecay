@@ -16,31 +16,10 @@ dd_plot <- function (city, from = TRUE, mi = FALSE, smoother = TRUE)
 {
     ylab <- "Covariance"
     if (mi)
-    {
-        m <- dd_mi (city)
-        m [m < 1e-6] <- 0 # Very low values muck up the log plots
         ylab <- "Mutual Information"
-    } else
-        m <- dd_cov (city)
-    d <- dd_get_distmat (city)
 
-    if (from)
-    {
-        d <- d [lower.tri (d)]
-        m <- m [lower.tri (m)]
-    } else
-    {
-        d <- d [upper.tri (d)]
-        m <- m [upper.tri (m)]
-    }
-
-    indx <- which (!is.na (m) & !is.na (d) & m > 0)
-    if (length (indx) == 0)
-        stop ("No or insufficient data available for ", city)
-    d <- d [indx]
-    m <- m [indx]
-
-    dat <- data.frame (x = d, y = m)
+    dat <- dd_get_vecs (city = city)
+    dat$n [dat$n < 1e-6] <- 0 # Very low values muck up the log plots
 
     x <- y <- ..count.. <- NULL # suppress R CMD check messges
     g <- ggplot2::ggplot (dat, ggplot2::aes (x = x, y = y)) +
@@ -77,7 +56,7 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
 {
     cities <- c ("la", "bo", "ch", "dc", "ny", "lo") # no pa data at present
 
-    m <- d <- ci <- NULL
+    n <- d <- ci <- NULL
 
     ylab <- "Covariance"
     if (mi)
@@ -86,41 +65,18 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
     message ("Extracting data ... ", appendLF = FALSE)
     for (i in cities)
     {
-        if (mi)
-            mtemp <- dd_mi (city = i)
-        else
-        {
-            mtemp <- dd_cov (city = i)
-            # Standardise to 0-1 scale
-            mtemp [mtemp < 0] <- 0
-            mtemp <- mtemp / max (mtemp, na.rm = TRUE)
-        }
-        dtemp <- dd_get_distmat (city = i)
-
-        if (from)
-        {
-            dtemp <- dtemp [lower.tri (dtemp)]
-            mtemp <- mtemp [lower.tri (mtemp)]
-        } else
-        {
-            dtemp <- dtemp [upper.tri (dtemp)]
-            mtemp <- mtemp [upper.tri (mtemp)]
-        }
-
-        indx <- which (!is.na (mtemp) & !is.na (dtemp) & mtemp > 0)
-        dtemp <- dtemp [indx]
-        mtemp <- mtemp [indx]
-
-        m <- c (m, mtemp)
-        d <- c (d, dtemp)
-        ci <- c (ci, rep (full_city_name (i), length (mtemp)))
+        dat <- dd_get_vecs (city = city)
+        dat$n [dat$n < 1e-6] <- 0 # Very low values muck up the log plots
+        n <- c (n, dat$n)
+        d <- c (d, dat$d)
+        ci <- c (ci, rep (full_city_name (i), nrow (dat)))
     }
 
     if (mi)
-        m [m < 1e-6] <- 0 # Very low values muck up the log plots
+        n [n < 1e-6] <- 0 # Very low values muck up the log plots
 
 
-    dat <- data.frame (x = d, y = m, city = ci)
+    dat <- data.frame (x = d, y = n, city = ci)
     message ("done\nThere are a total of ", nrow (dat), " data points")
 
     x <- y <- ..count.. <- NULL # suppress R CMD check messges
