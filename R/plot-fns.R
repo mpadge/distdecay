@@ -88,7 +88,12 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
         if (mi)
             mtemp <- dd_mi (city = i)
         else
+        {
             mtemp <- dd_cov (city = i)
+            # Standardise to 0-1 scale
+            mtemp [mtemp < 0] <- 0
+            mtemp <- mtemp / max (mtemp, na.rm = TRUE)
+        }
         dtemp <- dd_get_distmat (city = i)
 
         if (from)
@@ -115,7 +120,7 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
 
 
     dat <- data.frame (x = d, y = m, city = ci)
-    message ("done\nPreparing plot ...")
+    message ("done\nThere are a total of ", nrow (dat), " data points")
 
     g <- ggplot2::ggplot (dat, ggplot2::aes (x = x, y = y)) +
         ggplot2::stat_binhex (ggplot2::aes (fill = log (..count..)))#nolint
