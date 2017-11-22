@@ -5,7 +5,9 @@ require (magrittr)
 
 test_that ('data directories', {
                dd <- dd_get_data_dir ()
-               expect_equal (dd, file.path ("data", "data", "bikes"))
+               data_dir <- file.path ("data", "data", "bikes")
+               data_dir <- paste0 (.Platform$file.sep, data_dir, .Platform$file.sep)
+               expect_equal (dd, data_dir)
                system.file ('extdata', 'tripmats.rda', package = 'distdecay') %>%
                    file.path () %>%
                    dirname () %>%
