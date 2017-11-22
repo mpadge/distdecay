@@ -51,3 +51,10 @@ convert_city_name <- function (city)
     return (city)
 }
 
+full_city_name <- function (ci)
+{
+    full_names <- c ("New York", "Boston", "Chicago", "Washington DC",
+                     "Los Angeles", "London", "Philadelphia")
+    cities <- c ('ny', 'bo', 'ch', 'dc', 'la', 'lo', 'ph')
+    full_names [match (ci, cities)]
+}
