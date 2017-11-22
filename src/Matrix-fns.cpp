@@ -134,7 +134,34 @@ Rcpp::NumericMatrix rcpp_calc_mi (arma::mat tmat)
     }
 
     // Then repeat for columns
-    tmat = tmat.t ();
+    for (arma::uword i=0; i < (tmat.n_rows - 1); ++i)
+    {
+        arma::colvec xcol = tmat.col (i);
+
+        for (arma::uword j=(i + 1); j < tmat.n_rows; ++j)
+        {
+            arma::colvec ycol = tmat.col (j);
+
+            double sxy = arma::sum (xcol + ycol);
+
+            arma::colvec xcol2 = xcol / sxy;
+            ycol = ycol / sxy;
+            arma::mat pxy (xcol.n_elem, 2);
+            pxy.col (0) = xcol2;
+            pxy.col (1) = ycol;
+
+            // The arma matrix product is a colvec times a rowvec
+            arma::colvec px = xcol2 + ycol;
+            arma::rowvec py = {arma::sum (xcol2), arma::sum (ycol)};
+            arma::mat fnull = px * py; // null model
+
+            arma::uvec indx = arma::find (pxy > 0.0);
+            arma::mat xy (xcol.n_elem, 2, arma::fill::zeros);
+            xy.elem (indx) = log2 (pxy.elem (indx) / fnull.elem (indx));
+
+            mimat (j, i) = arma::sum (arma::sum (pxy % xy, 0));
+        }
+    }
 
     return mimat;
 }

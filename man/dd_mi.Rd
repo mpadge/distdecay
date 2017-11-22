@@ -10,7 +10,12 @@ dd_mi(city)
 \item{city}{City for which mutual information matrix is to be extracted}
 }
 \description{
-Calculate station-to-station mutual information matrix for a given city
+Calculate station-to-station mutual information matrix for a given city.
+Upper diagonal of matrix is between all trips \strong{from} i and j, so
+\code{dd_cov()[i, j]} holds the covariance between all trips \strong{from}
+station \code{i} to all other stations and \strong{from} station \code{j} to
+all other stations. Analogously, the lower diagonal (\code{dd_cov()[j, i]})
+holds covariances between all trips \strong{to} i and j.
 }
 \note{
 The directory from which trip matrices are loaded can be retrieveed
