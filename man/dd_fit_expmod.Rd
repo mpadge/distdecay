@@ -18,9 +18,9 @@ returned from \code{dd_get_tripdistmats()}.}
 \item{plot}{If \code{TRUE}, plot decay function}
 }
 \value{
-Vector of three values: \code{k}, the width parameter of the
-exponential decay, \code{b}, the value of the exponent, and \code{ss}, the
-standardised sum of squared residuals.
+A \code{data.frame} of four values: \code{id}, the ID of the station;
+\code{k}, the width parameter of the exponential decay; \code{b}, the value
+of the exponent; and \code{ss}, the standardised sum of squared residuals.
 }
 \description{
 Fit a generalised exponential decay model to data from one station

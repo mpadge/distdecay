@@ -171,9 +171,9 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 #' @param i Number of station as row or column of matrices
 #' @param plot If \code{TRUE}, plot decay function
 #'
-#' @return Vector of three values: \code{k}, the width parameter of the
-#' exponential decay, \code{b}, the value of the exponent, and \code{ss}, the
-#' standardised sum of squared residuals.
+#' @return A \code{data.frame} of four values: \code{id}, the ID of the station;
+#' \code{k}, the width parameter of the exponential decay; \code{b}, the value
+#' of the exponent; and \code{ss}, the standardised sum of squared residuals.
 #'
 #' @export
 dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
@@ -196,7 +196,7 @@ dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
         lines (dfit, yfit, col = "red")
     }
 
-    ret <- rep (NA, 3)
+    k <- b <- ss <- NA
     if (!is.null (mod))
     {
         coeffs <- summary (mod)$coefficients # a, k, b
@@ -206,10 +206,10 @@ dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
                     start = list(a = 10 * mean (ysc),
                                  k = coeffs [2], b = coeffs [3]))
         ss <- summary (mod)$residuals
-
-        ret <- c (coeffs [2:3], sum (ss ^ 2) / length (ss))
+        ss <- sum (ss ^ 2) / length (ss)
+        k <- coeffs [2]
+        b <- coeffs [3]
     }
-    names (ret) <- c ("k", "b", "ss")
-
-    return (ret)
+    id <- rownames (mats$trip) [i]
+    data.frame (id = id, k = k, b = b, ss = ss)
 }
