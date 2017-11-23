@@ -4,10 +4,13 @@
 \alias{dd_get_tripdistmats}
 \title{dd_get_tripdistsmatS}
 \usage{
-dd_get_tripdistmats(city)
+dd_get_tripdistmats(city, osm = TRUE)
 }
 \arguments{
 \item{city}{City for which matrices are to be extracted}
+
+\item{osm}{If \code{FALSE}, return straight-line distances, otherwise street
+network distances.}
 }
 \value{
 List of two square matrices of (i) numbers of trips (\code{$trip})

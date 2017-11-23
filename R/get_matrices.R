@@ -3,6 +3,8 @@
 #' Load pre-calculated distance matrix for a given city
 #'
 #' @param city City for which distance matrix is to be extracted
+#' @param osm If \code{FALSE}, return straight-line distances, otherwise street
+#' network distances.
 #' @return Square matrix of distances between all stations for nominated
 #' city.
 #'
@@ -10,14 +12,19 @@
 #' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
 #'
 #' @export
-dd_get_distmat <- function (city)
+dd_get_distmat <- function (city, osm = TRUE)
 {
     ci <- convert_city_name (city)
 
     files <- list.files (dd_get_data_dir ())
     f <- file.path (dd_get_data_dir (), files [grepl ("dist", files)])
-    if (length (f) > 1)
+    if (!osm)
+        f <- f [which (grepl ("straight", f))]
+    else
         f <- f [which (!grepl ("straight", f))]
+    if (length (f) != 1)
+        stop ("Can not locate distance matrices")
+
     load (f)
     obj <- ls () [grep ("distmat", ls ())]
 
@@ -60,6 +67,8 @@ dd_get_tripmat <- function (city)
 #' ensuring that all row and column names match.
 #'
 #' @param city City for which matrices are to be extracted
+#' @param osm If \code{FALSE}, return straight-line distances, otherwise street
+#' network distances.
 #' @return List of two square matrices of (i) numbers of trips (\code{$trip})
 #' and (ii) distances (\code{$dist}) between all stations for nominated city.
 #'
@@ -67,10 +76,10 @@ dd_get_tripmat <- function (city)
 #' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
 #'
 #' @export
-dd_get_tripdistmats <- function (city)
+dd_get_tripdistmats <- function (city, osm = TRUE)
 {
     tm <- dd_get_tripmat (city)
-    dm <- dd_get_distmat (city)
+    dm <- dd_get_distmat (city, osm = osm)
     bikedata::bike_match_matrices (dm, tm)
 }
 

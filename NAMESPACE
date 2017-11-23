@@ -2,6 +2,7 @@
 
 export(dd_compare_models)
 export(dd_cov)
+export(dd_decay_fns)
 export(dd_fit_expmod)
 export(dd_get_data_dir)
 export(dd_get_distmat)

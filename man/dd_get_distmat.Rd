@@ -4,10 +4,13 @@
 \alias{dd_get_distmat}
 \title{dd_get_distmat}
 \usage{
-dd_get_distmat(city)
+dd_get_distmat(city, osm = TRUE)
 }
 \arguments{
 \item{city}{City for which distance matrix is to be extracted}
+
+\item{osm}{If \code{FALSE}, return straight-line distances, otherwise street
+network distances.}
 }
 \value{
 Square matrix of distances between all stations for nominated
