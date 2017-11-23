@@ -21,10 +21,11 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
                                plot = FALSE)
 {
     ci <- convert_city_name (city)
-    dat <- dd_get_vecs (ci)
-    n <- nrow (dat)
+    dat <- dd_get_vecs (ci, mi = mi)
     d <- dat$d
     y <- dat$n
+    if (mi)
+        y <- 1 - y
 
     if (!mi)
         message (city, ": Fitting distance decays to covariances\n")
@@ -77,29 +78,15 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
     dfit <- seq(min(d), max(d), length.out = 100)
 
     # ***** power-law is done separately:
-    if (mi)
-    {
-        indx <- which (d > 0) # Because 0 distances do occur
-        y2 <- -y[indx]
-    }
-    else
-    {
-        indx <- which (y > 0 & d > 0) # Because 0 distances do occur
-        y2 <- y [indx]
-    }
-    d2 <- d [indx]
-
-    mod <- lm (log10 (y2) ~ log10 (d2))
+    mod <- lm (log10 (y) ~ log10 (d))
     coeffs <- summary (mod)$coefficients
-    yfit <- 10 ^ (coeffs [1] + log10 (d2) * coeffs [2])
-    results$ss [1] <- mean ( (yfit - y2) ^ 2) 
+    yfit <- 10 ^ (coeffs [1] + log10 (d) * coeffs [2])
+    results$ss [1] <- mean ( (yfit - y) ^ 2)
     results$k [1] <- coeffs [2]
     results$aic [1] <- AIC (mod)
     if (plot)
     {
         yfit <- 10 ^ (coeffs [1] + log10 (dfit) * coeffs [2])
-        if (mi)
-            yfit <- -yfit
         lines (dfit, yfit, col = cols [1], lty = ltys [1])
     }
 
