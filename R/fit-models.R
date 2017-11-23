@@ -178,10 +178,19 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 #' @export
 dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
 {
-    indx <- which (mats$trip [i, ] > 0 & !is.na (mats$d [i, ]) &
-                   mats$d [i, ] > 0)
-    d <- as.numeric (mats$dist [i, indx])
-    y <- as.numeric (mats$trip [i, indx])
+    if (from)
+    {
+        indx <- which (mats$trip [i, ] > 0 & !is.na (mats$d [i, ]) &
+                       mats$d [i, ] > 0)
+        d <- as.numeric (mats$dist [i, indx])
+        y <- as.numeric (mats$trip [i, indx])
+    } else
+    {
+        indx <- which (mats$trip [, i] > 0 & !is.na (mats$d [, i]) &
+                       mats$d [, i] > 0)
+        d <- as.numeric (mats$dist [indx, i])
+        y <- as.numeric (mats$trip [indx, i])
+    }
     if (plot)
         plot (d, y, pch = 1, col = "orange", log = "xy")
     # exponential model
@@ -225,40 +234,38 @@ dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
 #' @param mi If \code{TRUE}, plot decay functions for mutual information,
 #' otherwise plot covariances.
 #'
-#' @return a data frames of standardised squared residuals, p-statistics for
-#' t-test differences between OSM and straight line versions, mean and SD
+#' @return A \code{data.frame} of statistics for both straight-line distances
+#' (\code{_str}) and OpenStreetMap network distances (\code{_osm}) for the
+#' exponential decay function, exp (-(d / k) ^ b), of:
+#' \itemize{
+#'  \item \code{k}, the width of the exponential;
+#'  \item \code{b}, the exponent; and
+#'  \item \code{ss}, a standardised sum of sqaured residuals of the model fit
+#' }
 #' k-values quantifying the widths of exponential fits to the decay functions.
 #'
 #' @export
-dd_decay_fns <- function (city)
+dd_decay_fns <- function (city, from = TRUE)
 {
     mats1 <- dd_get_tripdistmats (city = city, osm = TRUE)
     n <- seq (nrow (mats1$trip))
-    res1 <- lapply (n, function (i) dd_fit_expmod (mats1, i = i))
+    res1 <- lapply (n, function (i) dd_fit_expmod (mats1, i = i, from = from))
     res1 <- do.call (rbind, res1)
 
     mats2 <- dd_get_tripdistmats (city = city, osm = FALSE)
     n <- seq (nrow (mats2$trip))
-    res2 <- lapply (n, function (i) dd_fit_expmod (mats2, i = i))
+    res2 <- lapply (n, function (i) dd_fit_expmod (mats2, i = i, from = from))
     res2 <- do.call (rbind, res2)
 
     nms <- intersect (res1$id, res2$id)
     res1 <- res1 [match (nms, res1$id), ]
     res2 <- res2 [match (nms, res2$id), ]
 
-    ss_osm <- mean (res1$ss, na.rm = TRUE)
-    ss_straight <- mean (res2$ss, na.rm = TRUE)
-    pval <- t.test (x = res1$ss, y = res2$ss, paired = TRUE)$p.value
-    kmn_osm <- mean (res1$k, na.rm = TRUE)
-    ksd_osm <- sd (res1$k, na.rm = TRUE)
-    kmn_straight <- mean (res2$k, na.rm = TRUE)
-    ksd_straight <- sd (res2$k, na.rm = TRUE)
-    data.frame (ss_osm = ss_osm,
-                ss_straight = ss_straight,
-                pss = pval,
-                kmn_osm = kmn_osm,
-                ksd_osm = ksd_osm,
-                kmn_straight = kmn_straight,
-                ksd_straight = ksd_straight,
-                stringsAsFactors = FALSE)
+    indx <- which (!is.na (res1$k) & !is.na (res2$k))
+    res1 <- res1 [indx, ]
+    res2 <- res2 [indx, ]
+    names (res1) [2:4] <- paste0 (names (res1) [2:4], "_osm")
+    names (res2) [2:4] <- paste0 (names (res2) [2:4], "_str")
+
+    cbind (res1, res2 [, 2:4])
 }

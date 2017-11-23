@@ -4,7 +4,7 @@
 \alias{dd_decay_fns}
 \title{dd_decay_fns}
 \usage{
-dd_decay_fns(city)
+dd_decay_fns(city, from = TRUE)
 }
 \arguments{
 \item{city}{City for which decay parameters are to be calculated}
@@ -17,8 +17,14 @@ station.}
 otherwise plot covariances.}
 }
 \value{
-a data frames of standardised squared residuals, p-statistics for
-t-test differences between OSM and straight line versions, mean and SD
+A \code{data.frame} of statistics for both straight-line distances
+(\code{_str}) and OpenStreetMap network distances (\code{_osm}) for the
+exponential decay function, exp (-(d / k) ^ b), of:
+\itemize{
+ \item \code{k}, the width of the exponential;
+ \item \code{b}, the exponent; and
+ \item \code{ss}, a standardised sum of sqaured residuals of the model fit
+}
 k-values quantifying the widths of exponential fits to the decay functions.
 }
 \description{
