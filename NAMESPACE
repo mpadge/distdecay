@@ -2,6 +2,7 @@
 
 export(dd_compare_models)
 export(dd_cov)
+export(dd_fit_expmod)
 export(dd_get_data_dir)
 export(dd_get_distmat)
 export(dd_get_tripdistmats)

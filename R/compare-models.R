@@ -158,3 +158,58 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 
     return (results)
 } # end compare.models()
+
+
+#' dd_fit_expmod
+#'
+#' Fit a generalised exponential decay model to data from one station
+#'
+#' @param mats List of distance and trip matrices for a particular city as
+#' returned from \code{dd_get_tripdistmats()}.
+#' @param from Analyse decay functions for trips \strong{from} each station. If
+#' \code{FALSE}, analyse for trips \strong{to} each station.
+#' @param i Number of station as row or column of matrices
+#' @param plot If \code{TRUE}, plot decay function
+#'
+#' @return Vector of three values: \code{k}, the width parameter of the
+#' exponential decay, \code{b}, the value of the exponent, and \code{ss}, the
+#' standardised sum of squared residuals.
+#'
+#' @export
+dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
+{
+    indx <- which (mats$trip [i, ] > 0 & !is.na (mats$d [i, ]) &
+                   mats$d [i, ] > 0)
+    d <- as.numeric (mats$dist [i, indx])
+    y <- as.numeric (mats$trip [i, indx])
+    if (plot)
+        plot (d, y, pch = 1, col = "orange", log = "xy")
+    # exponential model
+    mod <- tryCatch (nls (y ~ a * exp (-(d / k) ^ b), #nolint
+                          start = list(a = 10 * mean (y), k = 1, b = 1)),
+
+                     error = function (e) NULL)
+    if (plot & !is.null (mod))
+    {
+        dfit <- seq(min(d), max(d), length.out = 100)
+        yfit <- predict (mod, new = data.frame (d = dfit))
+        lines (dfit, yfit, col = "red")
+    }
+
+    ret <- rep (NA, 3)
+    if (!is.null (mod))
+    {
+        coeffs <- summary (mod)$coefficients # a, k, b
+        # Re-scale to unit intercept and calculate SS residuals
+        ysc <- y / coeffs [1]
+        mod <- nls (ysc ~ a * exp (-(d / k) ^ b), #nolint
+                    start = list(a = 10 * mean (ysc),
+                                 k = coeffs [2], b = coeffs [3]))
+        ss <- summary (mod)$residuals
+
+        ret <- c (coeffs [2:3], sum (ss ^ 2) / length (ss))
+    }
+    names (ret) <- c ("k", "b", "ss")
+
+    return (ret)
+}
