@@ -31,10 +31,6 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
     else
         message (city, ": Fitting distance decays to mutual information\n")
 
-    ssmult <- 1 / 10000
-    if (mi)
-        ssmult <- 1 / 10000
-
     # ***** THE FUNCTIONAL FORMS *****
     # For all models, b and k are respective form and width parameters.
     # Covariances generally decay to a slightly negative value, requiring all
@@ -68,12 +64,11 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
                             error = function (e) NULL)
     # ***** END FUNCTIONAL FORMS *****
 
-    mod1 <- data.frame (array (NA, dim = c(n, 3)))
-    names (mod1) <- c ("ss", "k", "aic")
-    mod2 <- data.frame (array (NA, dim = c(n, 4)))
-    names (mod2) <- c ("ss", "k", "b", "aic")
-    results <- list (pow = mod1, gauss = mod1, expo = mod2, weib = mod2,
-                     cauch = mod1, boxcox = mod2)
+    results <- data.frame (array (NA, dim = c(6, 4)))
+    names (results) <- c ("ss", "k", "b", "aic")
+    rownames (results) <- c("power", "gauss", "exp", "weibull",
+                            "cauchy", "boxcox")
+
     cols <- c ("black", "red", "red", "blue", "lawngreen", "magenta")
     ltys <- c (1, 1, 2, 1, 1, 1)
 
@@ -97,9 +92,9 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
     mod <- lm (log10 (y2) ~ log10 (d2))
     coeffs <- summary (mod)$coefficients
     yfit <- 10 ^ (coeffs [1] + log10 (d2) * coeffs [2])
-    results$pow$ss [1] <- mean ( (yfit - y2) ^ 2) * ssmult
-    results$pow$k [1] <- coeffs [2]
-    results$pow$aic [1] <- AIC (mod)
+    results$ss [1] <- mean ( (yfit - y2) ^ 2) 
+    results$k [1] <- coeffs [2]
+    results$aic [1] <- AIC (mod)
     if (plot)
     {
         yfit <- 10 ^ (coeffs [1] + log10 (dfit) * coeffs [2])
@@ -123,11 +118,13 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
         if (!is.null (mod))
         {
             yfit <- mean ( (predict (mod) - y) ^ 2)
-            results [[i + 1]]$ss [i] <- yfit * ssmult
-            results [[i + 1]]$k [i] <- summary (mod)$coefficients [2]
-            results [[i + 1]]$aic [i] <- AIC (mod)
-            if (dim (results[[i + 1]])[2] > 3)
-                results [[i + 1]]$b <- summary (mod)$coefficients [3]
+            coeffs <- summary (mod)$coefficients
+            # coeffs are either [a,k,y0] or [a,k,b,y0], where y0 is ignored
+            results$ss [i + 1] <- yfit
+            results$k [i + 1] <- coeffs [2]
+            results$aic [i + 1] <- AIC (mod)
+            if (nrow (coeffs) > 3)
+                results$b [i + 1] <- summary (mod)$coefficients [3]
             if (plot)
             {
                 yfit <- predict (mod, new = data.frame (d = dfit))
@@ -141,43 +138,36 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
         legend ("topright", lwd = 2, col = cols, lty = ltys,
                 bty = "n", legend = c("power", "gauss", "exp",
                                       "weibull", "cauchy", "boxcox"))
-        title (main = i)
-        #loc <- locator (n = 1) #nolint
     }
 
-    if (mi)
-        results$pow$k <- -results$pow$k
+    results$k [1] <- -results$k [1] # power-law
+    # Sign of Gaussian k is sometimes negative, so
+    results$k [2] <- abs (results$k [2])
 
-    # Box-Cox fits yield occassionally enormous k-values, so
-    indx <- which (results$boxcox$k > (5 * median (results$boxcox$k,
-                                                   na.rm = TRUE)))
-    results$boxcox [indx, ] <- NA
-    # And sign of Gaussian k is sometimes negative, so
-    results$gauss$k <- abs (results$gauss$k)
+    # standardise SS vals
+    results$ss <- results$ss / min (results$ss)
 
-    cat ("Model\t|\tSS\tAIC\t|\tk\t\tb\t|\n")
-    cat (c (rep ("-", 66), "\n"), sep = "")
-    for (i in 1:length (results))
+    cat ("Model\t|\tSS\t\tAIC\t|\tk\t\tb\t|\n")
+    cat (c (rep ("-", 73), "\n"), sep = "")
+    for (i in seq (nrow (results)))
     {
-        ss <- formatC (mean (results [[i]]$ss, na.rm = TRUE),
-                    format = "f", digits = 2)
-        aic <- round (mean (results [[i]]$aic, na.rm = TRUE))
-        k <- formatC (mean (results [[i]]$k, na.rm = TRUE),
-                    format = "f", digits = 2)
-        if (dim (results [[i]])[2] > 3)
-            b <- formatC (mean (results [[i]]$b, na.rm = TRUE),
-                    format = "f", digits = 2)
-        else
-            b <- ""
-        cat (names (results) [i], "\t|\t", ss, "\t", aic, "\t|\t",
-             k, "\t\t")
-        if (dim (results [[i]])[2] == 3)
-            cat ("\t|\n")
-        else
+        ss <- formatC (results$ss [i], format = "f", digits = 4)
+        aic <- round (results$aic [i])
+        k <- formatC (results$k [i], format = "f", digits = 2)
+        b <- ""
+        if (!is.na (results$b [i]))
+            b <- formatC (results$b [i], format = "f", digits = 2)
+        cat (rownames (results) [i])
+        if (rownames (results) [i] != "weibull")
+            cat ("\t")
+        cat ("|\t", ss, "\t", aic, "\t|\t", k, "\t\t")
+        if (!is.na (results$b [i]))
             cat (b, "\t|\n")
+        else
+            cat ("\t|\n")
 
     }
-    cat (c (rep ("-", 66), "\n"), sep = "")
+    cat (c (rep ("-", 73), "\n"), sep = "")
 
     return (results)
 } # end compare.models()
