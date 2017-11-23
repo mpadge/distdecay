@@ -16,6 +16,8 @@ dd_get_distmat <- function (city)
 
     files <- list.files (dd_get_data_dir ())
     f <- file.path (dd_get_data_dir (), files [grepl ("dist", files)])
+    if (length (f) > 1)
+        f <- f [which (!grepl ("straight", f))]
     load (f)
     obj <- ls () [grep ("distmat", ls ())]
 
