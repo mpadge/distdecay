@@ -19,6 +19,9 @@ matrix:
           #- os: osx
           #r: devel
 
+before_install:
+    - sudo apt-get install libomp-dev # required for clang, not gcc
+
 notifications:
   email:
     on_success: change
