@@ -86,8 +86,8 @@ dd_get_tripdistmats <- function (city, osm = TRUE)
 
 #' dd_get_vecs
 #'
-#' Get data.frame of distances (\code{d}) and numbers of trips (\code{n}) for a
-#' given city
+#' Get data.frame of distances (\code{d}) and either covariances of mutual
+#' information statistics (\code{n}) for a given city
 #' @noRd
 dd_get_vecs <- function (city, from = TRUE, mi = FALSE)
 {

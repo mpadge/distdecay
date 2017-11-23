@@ -21,11 +21,13 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
                                plot = FALSE)
 {
     ci <- convert_city_name (city)
-    dat <- dd_get_vecs (ci, mi = mi)
+    dat <- dd_get_vecs (ci, from = from, mi = mi)
     d <- dat$d
     y <- dat$n
     if (mi)
         y <- 1 - y
+    else
+        d [d < 0] <- 0
 
     if (!mi)
         message (city, ": Fitting distance decays to covariances\n")
@@ -160,15 +162,19 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 } # end compare.models()
 
 
-#' dd_fit_expmod
+#' dd_fit_stations
 #'
 #' Fit a generalised exponential decay model to data from one station
 #'
-#' @param mats List of distance and trip matrices for a particular city as
-#' returned from \code{dd_get_tripdistmats()}.
+#' @param city City for which model is to be fitted
 #' @param from Analyse decay functions for trips \strong{from} each station. If
 #' \code{FALSE}, analyse for trips \strong{to} each station.
-#' @param i Number of station as row or column of matrices
+#' @param mi If \code{TRUE}, fit decay functions for mutual information,
+#' otherwise fit covariances.
+#' @param expmod If \code{TRUE}, fit exponential decay models, otherwise fit
+#' power-law decays.
+#' @param osm If \code{FALSE}, use straight-line distances for distance decay
+#' parameters, otherwise street network distances.
 #' @param plot If \code{TRUE}, plot decay function
 #'
 #' @return A \code{data.frame} of four values: \code{id}, the ID of the station;
@@ -176,50 +182,102 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 #' of the exponent; and \code{ss}, the standardised sum of squared residuals.
 #'
 #' @export
-dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
+dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
+                             expmod = TRUE, osm = TRUE, plot = FALSE)
 {
+    ci <- convert_city_name (city)
+    cv <- dd_cov (city = ci)
+    cv [cv < 0] <- NA
+    dists <- dd_get_distmat (city = ci, osm = osm)
+    if (!identical (rownames (dists), rownames (cv))) # generally for !osm
+    {
+        nms <- intersect (rownames (dists), rownames (cv))
+        indx <- match (nms, rownames (dists))
+        dists <- dists [indx, indx]
+        indx <- match (nms, rownames (cv))
+        cv <- cv [indx, indx]
+    }
+
     if (from)
-    {
-        indx <- which (mats$trip [i, ] > 0 & !is.na (mats$d [i, ]) &
-                       mats$d [i, ] > 0)
-        d <- as.numeric (mats$dist [i, indx])
-        y <- as.numeric (mats$trip [i, indx])
-    } else
-    {
-        indx <- which (mats$trip [, i] > 0 & !is.na (mats$d [, i]) &
-                       mats$d [, i] > 0)
-        d <- as.numeric (mats$dist [indx, i])
-        y <- as.numeric (mats$trip [indx, i])
-    }
-    if (plot)
-        plot (d, y, pch = 1, col = "orange", log = "xy")
-    # exponential model
-    mod <- tryCatch (nls (y ~ a * exp (-(d / k) ^ b), #nolint
-                          start = list(a = 10 * mean (y), k = 1, b = 1)),
+        cv [upper.tri (cv)] <- NA
+    else
+        cv [lower.tri (cv)] <- NA
 
-                     error = function (e) NULL)
-    if (plot & !is.null (mod))
+    id <- k <- b <- ss <- rep (NA, nrow (dists))
+    pb <- txtProgressBar (style = 3)
+    for (i in seq (nrow (dists)))
     {
-        dfit <- seq(min(d), max(d), length.out = 100)
-        yfit <- predict (mod, new = data.frame (d = dfit))
-        lines (dfit, yfit, col = "red")
-    }
+        d <- c (dists [i, ], dists [, i])
+        y <- c (cv [i, ], cv [, i])
+        indx <- which (d > 0 & !is.na (d) & !is.na (y) & y > 0)
+        d <- d [indx]
+        y <- y [indx]
 
-    k <- b <- ss <- NA
-    if (!is.null (mod))
-    {
-        coeffs <- summary (mod)$coefficients # a, k, b
-        # Re-scale to unit intercept and calculate SS residuals
-        ysc <- y / coeffs [1]
-        mod <- nls (ysc ~ a * exp (-(d / k) ^ b), #nolint
-                    start = list(a = 10 * mean (ysc),
-                                 k = coeffs [2], b = coeffs [3]))
-        ss <- summary (mod)$residuals
-        ss <- sum (ss ^ 2) / length (ss)
-        k <- coeffs [2]
-        b <- coeffs [3]
+        if (mi)
+            y <- 1 - y
+
+        if (length (y) > 1)
+        {
+            if (plot)
+                plot (d, y, pch = 1, col = "orange", log = "xy",
+                      main = paste (i, ": ", rownames (dists) [i]))
+
+            if (expmod)
+            {
+                # exponential model
+                mod <- tryCatch (nls (y ~ a * exp (-(d / k) ^ 1), #nolint
+                                      start = list(a = 2 * mean (y), k = 1)),
+                                 error = function (e) NULL)
+                if (!is.null (mod))
+                {
+                    coeffs <- summary (mod)$coefficients
+                    mod <- tryCatch (nls (y ~ a * exp (-(d / k) ^ b), #nolint
+                                          start = list(a = coeffs [1], k = coeffs [2], b = 2)),
+                                     error = function (e) NULL)
+                }
+            } else
+            {
+                # statistically invalid linear fit to log-scaled data!
+                yl <- log (y)
+                dl <- log (d)
+                mod <- lm (yl ~ dl)
+                km <- 10 ^ summary (mod)$coefficients [2]
+                mod <- tryCatch (nls (y ~ a * d ^ (-k),
+                                      start = list(a = max (y), k = km)),
+                                 error = function (e) NULL)
+            }
+            if (plot & !is.null (mod))
+            {
+                dfit <- seq(min(d), max(d), length.out = 100)
+                yfit <- predict (mod, new = data.frame (d = dfit))
+                lines (dfit, yfit, col = "red")
+                loc <- locator (n = 1)
+            }
+
+            if (!is.null (mod))
+            {
+                coeffs <- summary (mod)$coefficients # a, k, b
+                # Re-scale to unit intercept and calculate SS residuals
+                ysc <- y / coeffs [1]
+                if (expmod)
+                    mod <- nls (ysc ~ a * exp (-(d / k) ^ b), #nolint
+                                start = list(a = 10 * mean (ysc),
+                                             k = coeffs [2], b = coeffs [3]))
+                else
+                    mod <- nls (y ~ a * d ^ (-k),
+                                start = list(a = coeffs [1], k = coeffs [2]))
+                ssi <- summary (mod)$residuals
+                ss [i] <- sum (ssi ^ 2) / length (ssi)
+                k [i] <- coeffs [2]
+                if (expmod)
+                    b [i] <- coeffs [3]
+            }
+        } # end if length (y) > 1
+        id [i] <- rownames (cv) [i]
+        setTxtProgressBar (pb, i / nrow (dists))
     }
-    id <- rownames (mats$trip) [i]
+    close (pb)
+
     data.frame (id = id, k = k, b = b, ss = ss, stringsAsFactors = FALSE)
 }
 
