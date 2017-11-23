@@ -15,8 +15,10 @@
 #' @importFrom ggplot2 facet_wrap geom_smooth ggplot guides 
 #' @importFrom ggplot2 scale_fill_gradientn scale_x_log10 scale_y_log10 
 #' @importFrom ggplot2 stat_binhex xlab ylab 
+#' @importFrom graphics legend lines title
 #' @importFrom jsonlite fromJSON
 #' @importFrom Rcpp evalCpp
+#' @importFrom stats AIC lm median nls predict
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
 NULL
