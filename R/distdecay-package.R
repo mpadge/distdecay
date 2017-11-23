@@ -18,7 +18,7 @@
 #' @importFrom graphics legend lines title
 #' @importFrom jsonlite fromJSON
 #' @importFrom Rcpp evalCpp
-#' @importFrom stats AIC lm median nls predict
+#' @importFrom stats AIC lm median nls predict sd t.test
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
 NULL

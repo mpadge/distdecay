@@ -65,7 +65,7 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
     message ("Extracting data ... ", appendLF = FALSE)
     for (i in cities)
     {
-        dat <- dd_get_vecs (city = city)
+        dat <- dd_get_vecs (city = i)
         dat$n [dat$n < 1e-6] <- 0 # Very low values muck up the log plots
         n <- c (n, dat$n)
         d <- c (d, dat$d)

@@ -12,9 +12,6 @@ dd_decay_fns(city, from = TRUE)
 \item{from}{Plot covariance or MI values for trips \strong{from} each
 station. If \code{FALSE}, plot equivalent values for trips \strong{to} each
 station.}
-
-\item{mi}{If \code{TRUE}, plot decay functions for mutual information,
-otherwise plot covariances.}
 }
 \value{
 A \code{data.frame} of statistics for both straight-line distances

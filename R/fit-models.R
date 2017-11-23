@@ -231,8 +231,6 @@ dd_fit_expmod <- function (mats, i, from = TRUE, plot = FALSE)
 #' @param from Plot covariance or MI values for trips \strong{from} each
 #' station. If \code{FALSE}, plot equivalent values for trips \strong{to} each
 #' station.
-#' @param mi If \code{TRUE}, plot decay functions for mutual information,
-#' otherwise plot covariances.
 #'
 #' @return A \code{data.frame} of statistics for both straight-line distances
 #' (\code{_str}) and OpenStreetMap network distances (\code{_osm}) for the
