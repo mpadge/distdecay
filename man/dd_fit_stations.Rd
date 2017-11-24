@@ -4,14 +4,20 @@
 \alias{dd_fit_stations}
 \title{dd_fit_stations}
 \usage{
-dd_fit_stations(city, from = TRUE, mi = FALSE, expmod = TRUE,
-  osm = TRUE, plot = FALSE)
+dd_fit_stations(city, from = TRUE, lower = 0, upper = 1, mi = FALSE,
+  expmod = TRUE, osm = TRUE, plot = FALSE)
 }
 \arguments{
 \item{city}{City for which model is to be fitted}
 
 \item{from}{Analyse decay functions for trips \strong{from} each station. If
 \code{FALSE}, analyse for trips \strong{to} each station.}
+
+\item{lower}{Lower limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
+
+\item{upper}{Upper limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
 
 \item{mi}{If \code{TRUE}, fit decay functions for mutual information,
 otherwise fit covariances.}
@@ -31,4 +37,8 @@ of the exponent; and \code{ss}, the standardised sum of squared residuals.
 }
 \description{
 Fit a generalised exponential decay model to data from one station
+}
+\note{
+Power-law fits (with \code{expmod = FALSE}) are not reliable at all.
+The decays really are not power-laws, so this ought not be used.
 }

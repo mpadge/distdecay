@@ -19,6 +19,5 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats AIC lm median nls predict sd t.test
-#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
 NULL

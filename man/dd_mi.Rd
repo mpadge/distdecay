@@ -4,10 +4,19 @@
 \alias{dd_mi}
 \title{dd_mi}
 \usage{
-dd_mi(city)
+dd_mi(city, lower = 0, upper = 1, osm = TRUE)
 }
 \arguments{
 \item{city}{City for which mutual information matrix is to be extracted}
+
+\item{lower}{Lower limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
+
+\item{upper}{Upper limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
+
+\item{osm}{If \code{FALSE}, return straight-line distances, otherwise street
+network distances.}
 }
 \description{
 Calculate station-to-station mutual information matrix for a given city.

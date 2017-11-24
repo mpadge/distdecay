@@ -169,6 +169,10 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 #' @param city City for which model is to be fitted
 #' @param from Analyse decay functions for trips \strong{from} each station. If
 #' \code{FALSE}, analyse for trips \strong{to} each station.
+#' @param lower Lower limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
+#' @param upper Upper limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
 #' @param mi If \code{TRUE}, fit decay functions for mutual information,
 #' otherwise fit covariances.
 #' @param expmod If \code{TRUE}, fit exponential decay models, otherwise fit
@@ -181,12 +185,20 @@ dd_compare_models <- function (city = "nyc", from = TRUE, mi = FALSE,
 #' \code{k}, the width parameter of the exponential decay; \code{b}, the value
 #' of the exponent; and \code{ss}, the standardised sum of squared residuals.
 #'
+#' @note Power-law fits (with \code{expmod = FALSE}) are not reliable at all.
+#' The decays really are not power-laws, so this ought not be used.
+#'
 #' @export
-dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
-                             expmod = TRUE, osm = TRUE, plot = FALSE)
+dd_fit_stations <- function (city, from = TRUE, lower = 0, upper = 1,
+                             mi = FALSE, expmod = TRUE, osm = TRUE,
+                             plot = FALSE)
 {
     ci <- convert_city_name (city)
-    cv <- dd_cov (city = ci)
+    if (mi)
+        cv <- 1 - dd_mi (city = ci, lower = lower, upper = upper)
+    else
+        cv <- dd_cov (city = ci, lower = lower, upper = upper)
+
     cv [cv < 0] <- NA
     dists <- dd_get_distmat (city = ci, osm = osm)
     if (!identical (rownames (dists), rownames (cv))) # generally for !osm
@@ -204,7 +216,6 @@ dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
         cv [lower.tri (cv)] <- NA
 
     id <- k <- b <- ss <- rep (NA, nrow (dists))
-    pb <- txtProgressBar (style = 3)
     for (i in seq (nrow (dists)))
     {
         d <- c (dists [i, ], dists [, i])
@@ -213,14 +224,10 @@ dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
         d <- d [indx]
         y <- y [indx]
 
-        if (mi)
-            y <- 1 - y
-
         if (length (y) > 1)
         {
             if (plot)
-                plot (d, y, pch = 1, col = "orange", log = "xy",
-                      main = paste (i, ": ", rownames (dists) [i]))
+                plot (d, y, pch = 1, col = "orange", log = "xy")
 
             if (expmod)
             {
@@ -232,14 +239,15 @@ dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
                 {
                     coeffs <- summary (mod)$coefficients
                     mod <- tryCatch (nls (y ~ a * exp (-(d / k) ^ b), #nolint
-                                          start = list(a = coeffs [1], k = coeffs [2], b = 2)),
+                                          start = list(a = coeffs [1],
+                                                       k = coeffs [2], b = 2)),
                                      error = function (e) NULL)
                 }
             } else
             {
                 # statistically invalid linear fit to log-scaled data!
-                yl <- log (y)
-                dl <- log (d)
+                yl <- log (y) #nolint
+                dl <- log (d) #nolint
                 mod <- lm (yl ~ dl)
                 km <- 10 ^ summary (mod)$coefficients [2]
                 mod <- tryCatch (nls (y ~ a * d ^ (-k),
@@ -251,7 +259,10 @@ dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
                 dfit <- seq(min(d), max(d), length.out = 100)
                 yfit <- predict (mod, new = data.frame (d = dfit))
                 lines (dfit, yfit, col = "red")
-                loc <- locator (n = 1)
+                title (main = paste (i, ": ", rownames (dists) [i], "; k = ",
+                       formatC (summary (mod)$coefficients [2],
+                                format = "f", digits = 2)))
+                loc <- locator (n = 1) #nolint
             }
 
             if (!is.null (mod))
@@ -274,16 +285,12 @@ dd_fit_stations <- function (city, from = TRUE, mi = FALSE,
             }
         } # end if length (y) > 1
         id [i] <- rownames (cv) [i]
-        setTxtProgressBar (pb, i / nrow (dists))
     }
-    close (pb)
 
     data.frame (id = id, k = k, b = b, ss = ss, stringsAsFactors = FALSE)
 }
 
 #' dd_decay_fns
-#'
-#'
 #'
 #' @param city City for which decay parameters are to be calculated
 #' @param from Plot covariance or MI values for trips \strong{from} each
@@ -324,4 +331,44 @@ dd_decay_fns <- function (city, from = TRUE)
     names (res2) [2:4] <- paste0 (names (res2) [2:4], "_str")
 
     cbind (res1, res2 [, 2:4])
+}
+
+#' width_ratios
+#'
+#' Calculate ratios of widths of decay parameters for covariances calculated
+#' over different distance deciles.
+#'
+#' @param city City for which ratios are to be calculated
+#' @return \code{data.frame} of deciles, equivalent distances, and ratios of
+#' both exponential decay width parameters (\code{k}), and squared errors
+#' (\code{ss}).
+#' @export
+width_ratios <- function (city)
+{
+    pb <- txtProgressBar (style = 3)
+    d <- rk <- rss <- rep (NA, 10)
+    for (i in 1:10)
+    {
+        lo <- (i - 1) / 10
+        hi <- i / 10
+        x_osm <- dd_fit_stations (city = city, lower = lo, upper = hi)
+        setTxtProgressBar (pb, (i - 0.5) / 10)
+        x_str <- dd_fit_stations (city = city, lower = lo, upper = hi,
+                                  osm = FALSE)
+        rk [i] <- mean (x_osm$k, na.rm = TRUE) / mean (x_str$k, na.rm = TRUE)
+        rss [i] <- mean (x_osm$ss, na.rm = TRUE) /
+            mean (x_str$ss, na.rm = TRUE)
+        # Then convert deciles to distance estimates
+        mats <- dd_get_tripdistmats (city, osm = TRUE)
+        indx <- dist_thresholds (mats, lower = lo, upper = hi)
+        for (j in seq (indx))
+            if (length (indx [[j]]) > 0)
+                mats$dist [j, indx [[j]]] <- mats$dist [indx [[j]], j] <- 0
+        mats$dist [mats$dist == 0] <- NA
+        d [i] <- mean (mats$dist, na.rm = TRUE)
+
+        setTxtProgressBar (pb, i  / 10)
+    }
+    close (pb)
+    data.frame (decile = 1:10 / 10, d = d, rk = rk, rss = rss)
 }

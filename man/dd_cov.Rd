@@ -4,10 +4,19 @@
 \alias{dd_cov}
 \title{dd_cov}
 \usage{
-dd_cov(city)
+dd_cov(city, lower = 0, upper = 1, osm = TRUE)
 }
 \arguments{
 \item{city}{City for which covariance matrix is to be extracted}
+
+\item{lower}{Lower limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
+
+\item{upper}{Upper limit (0-1) for distance cutoff used to calculate
+covariances (see details)}
+
+\item{osm}{If \code{FALSE}, return straight-line distances, otherwise street
+network distances.}
 }
 \description{
 Calculate station-to-station covariance matrix for a given city. Upper
@@ -19,5 +28,9 @@ holds covariances between all trips \strong{to} i and j.
 }
 \note{
 The directory from which trip matrices are loaded can be retrieveed
-with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
+with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}. Covariances
+can be calculated between stations lying within a defined distance range
+using the \code{lower} and \code{upper} parameters. For example, to calculate
+covariances only using the nearest half of all stations, set \code{upper =
+0.5}.
 }

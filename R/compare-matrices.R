@@ -8,14 +8,31 @@
 #' holds covariances between all trips \strong{to} i and j.
 #'
 #' @param city City for which covariance matrix is to be extracted
+#' @param lower Lower limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
+#' @param upper Upper limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
+#' @param osm If \code{FALSE}, return straight-line distances, otherwise street
+#' network distances.
 #'
 #' @note The directory from which trip matrices are loaded can be retrieveed
-#' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
+#' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}. Covariances
+#' can be calculated between stations lying within a defined distance range
+#' using the \code{lower} and \code{upper} parameters. For example, to calculate
+#' covariances only using the nearest half of all stations, set \code{upper =
+#' 0.5}.
 #'
 #' @export
-dd_cov <- function (city)
+dd_cov <- function (city, lower = 0, upper = 1, osm = TRUE)
 {
-    mats <- dd_get_tripdistmats (city)
+    mats <- dd_get_tripdistmats (city, osm = osm)
+    if (lower > 0 | upper < 1)
+    {
+        indx <- dist_thresholds (mats, lower, upper)
+        for (i in seq (indx))
+            if (length (indx [[i]]) > 0)
+                mats$trip [i, indx [[i]]] <- mats$trip [indx [[i]], i] <- 0
+    }
     cmat <- rcpp_calc_cov (mats$trip)
 
     rownames (cmat) <- rownames (mats$trip)
@@ -34,18 +51,47 @@ dd_cov <- function (city)
 #' holds covariances between all trips \strong{to} i and j.
 #'
 #' @param city City for which mutual information matrix is to be extracted
+#' @param lower Lower limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
+#' @param upper Upper limit (0-1) for distance cutoff used to calculate
+#' covariances (see details)
+#' @param osm If \code{FALSE}, return straight-line distances, otherwise street
+#' network distances.
 #'
 #' @note The directory from which trip matrices are loaded can be retrieveed
 #' with \link{dd_get_data_dir}, and set with \link{dd_set_data_dir}.
 #'
 #' @export
-dd_mi <- function (city)
+dd_mi <- function (city, lower = 0, upper = 1, osm = TRUE)
 {
     mats <- dd_get_tripdistmats (city)
+    if (lower > 0 | upper < 1)
+    {
+        indx <- dist_thresholds (mats, lower, upper)
+        for (i in seq (indx))
+            mats$trips [i, indx [i]] <- mats$trips [indx [i], i] <- 0
+    }
     mmat <- rcpp_calc_mi (mats$trip)
 
     rownames (mmat) <- rownames (mats$trip)
     colnames (mmat) <- colnames (mats$trip)
     mmat [!is.finite (mmat)] <- NA
     return (mmat)
+}
+
+#' dist_thresholds
+#'
+#' Convert relative values of \code{lower} and \code{upper} limits to indices of
+#' elements that lie \strong{outside} those limits. These indices can then be
+#' used to set all those values to zero.
+#'
+#' @noRd
+dist_thresholds <- function (mats, lower, upper)
+{
+    apply (mats$dist, 1, function (i)
+           {
+               dlo <- lower * min (i, na.rm = TRUE)
+               dhi <- upper * max (i, na.rm = TRUE)
+               as.numeric (which (i < dlo | i > dhi))
+           })
 }

@@ -32,16 +32,26 @@ Rcpp::NumericMatrix rcpp_calc_cov (arma::mat tmat)
     for (arma::uword i=0; i < (tmat.n_rows - 1); ++i)
     {
         arma::rowvec xrow = tmat.row (i);
-        const double sx = arma::sum (xrow);
+        double sx = arma::sum (xrow);
+        if (_standardise)
+        {
+            xrow = xrow / sx;
+            sx = 1.0;
+        }
 
         for (arma::uword j=(i + 1); j < tmat.n_rows; ++j)
         {
             arma::rowvec yrow = tmat.row (j);
+            double sy = arma::sum (yrow);
+            if (_standardise)
+            {
+                yrow = yrow / sy;
+                sy = 1.0;
+            }
             arma::rowvec xy = xrow % yrow; // arma element-wise multiplication
             const double nnz = static_cast <double> (
                     arma::size (arma::find (xy > 0.0)) [0]);
-            const double sy = arma::sum (yrow),
-                  sxy = arma::sum (xy);
+            const double sxy = arma::sum (xy);
 
             covmat (i, j) = (sxy - sx * sy / nnz) / nnz;
         }
@@ -52,16 +62,26 @@ Rcpp::NumericMatrix rcpp_calc_cov (arma::mat tmat)
     for (arma::uword i=0; i < (tmat.n_rows - 1); ++i)
     {
         arma::rowvec xrow = tmat.row (i);
-        const double sx = arma::sum (xrow);
+        double sx = arma::sum (xrow);
+        if (_standardise)
+        {
+            xrow = xrow / sx;
+            sx = 1.0;
+        }
 
         for (arma::uword j=(i + 1); j < tmat.n_rows; ++j)
         {
             arma::rowvec yrow = tmat.row (j);
+            double sy = arma::sum (yrow);
+            if (_standardise)
+            {
+                yrow = yrow / sy;
+                sy = 1.0;
+            }
             arma::rowvec xy = xrow % yrow;
             const double nnz = static_cast <double> (
                     arma::size (arma::find (xy > 0.0)) [0]);
-            const double sy = arma::sum (yrow),
-                  sxy = arma::sum (xy);
+            const double sxy = arma::sum (xy);
 
             covmat (j, i) = (sxy - sx * sy / nnz) / nnz;
         }
