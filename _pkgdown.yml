@@ -1,0 +1,45 @@
+title: distdecay
+
+templates:
+  params:
+    bootswatch: cerulean
+
+reference:
+  - title: Package doc
+    contents:
+    - distdecay-package
+  - title: The Main Functions
+    contents:
+    - dd_compare_models
+    - dd_cov
+    - dd_decay_fns
+    - dd_fit_stations
+    - dd_get_data_dir
+    - dd_get_distmat
+    - dd_get_tripdistmats
+    - dd_get_tripmat
+    - dd_mi
+    - dd_plot
+    - dd_plot_all
+    - dd_set_data_dir
+    - distmat_g
+    - width_ratios
+
+articles:
+  - title: The distdecay package
+    contents:
+    - distdecay
+
+navbar:
+  title: distdecay
+  type: default
+  left:
+  - text: Home
+    href: index.html
+  - text: Vignettes
+    href: articles/index.html
+  - text: Functions
+    href: reference/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/mpadge/distdecay

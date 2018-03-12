@@ -1,0 +1,26 @@
+---
+title: "distdecay"
+author: "Mark Padgham"
+date: "`r Sys.Date()`"
+output: 
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: false
+        theme: flatly
+header-includes: 
+    - \usepackage{tikz}
+    - \usetikzlibrary{arrows}
+vignette: >
+  %\VignetteIndexEntry{distdecay}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r pkg-load, echo = FALSE, message = FALSE}
+devtools::load_all (".", export_all = FALSE)
+```
+
+# Distance decay functions
+
+This package calculates distance decay functions.
