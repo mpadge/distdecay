@@ -4,7 +4,8 @@
 \alias{dd_cov}
 \title{dd_cov}
 \usage{
-dd_cov(city, lower = 0, upper = 1, osm = TRUE)
+dd_cov(city, lower = 0, upper = 1, osm = TRUE, neutral = FALSE,
+  k = NULL)
 }
 \arguments{
 \item{city}{City for which covariance matrix is to be extracted}
@@ -17,6 +18,15 @@ covariances (see details)}
 
 \item{osm}{If \code{FALSE}, return straight-line distances, otherwise street
 network distances.}
+
+\item{neutral}{If \code{TRUE}, return a covariance matrix corresponding to a
+neutral spatial interaction model rather than the observed trip matrix. These
+neutral covariance matrices can be compared with observed ones to reveal
+station pairs with higher-than-expected covariances.}
+
+\item{k}{For neutral covariance matrices, the exponential decay parameter of
+the spatial interaction model. If not specified, the value is determined by
+maximising fit between neutral and observed models.}
 }
 \description{
 Calculate station-to-station covariance matrix for a given city. Upper

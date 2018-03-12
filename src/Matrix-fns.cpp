@@ -53,7 +53,8 @@ Rcpp::NumericMatrix rcpp_calc_cov (arma::mat tmat)
                     arma::size (arma::find (xy > 0.0)) [0]);
             const double sxy = arma::sum (xy);
 
-            covmat (i, j) = (sxy - sx * sy / nnz) / nnz;
+            if (nnz > 2.0) // only calculate covariances when > 2 finite entries
+                covmat (i, j) = (sxy - sx * sy / nnz) / nnz;
         }
     }
 
@@ -83,7 +84,8 @@ Rcpp::NumericMatrix rcpp_calc_cov (arma::mat tmat)
                     arma::size (arma::find (xy > 0.0)) [0]);
             const double sxy = arma::sum (xy);
 
-            covmat (j, i) = (sxy - sx * sy / nnz) / nnz;
+            if (nnz > 2.0)
+                covmat (j, i) = (sxy - sx * sy / nnz) / nnz;
         }
     }
 

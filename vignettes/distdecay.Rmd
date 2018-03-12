@@ -23,4 +23,9 @@ devtools::load_all (".", export_all = FALSE)
 
 # Distance decay functions
 
-This package calculates distance decay functions.
+This package uses output from the [`bikedata`
+package](https://github.com/ropensci/bikedata) to analyse distance decay
+functions. The package mostly relies on two corresponding matrices of numbers of
+trips and distances between all pairs of stations. These data are bundled
+internally as `tripmats` and `distmats`, respectively.
+
