@@ -21,3 +21,27 @@
 #' @importFrom stats AIC lm median nls predict sd t.test
 #' @useDynLib distdecay, .registration = TRUE
 NULL
+
+#' distmats
+#' 
+#' Station-to-station distance matrices between bicycle hire stations for all
+#' cities of the \pkg{bikedata} package, calculated with the \code{bike_distmat}
+#' function. These matrices have been reconciled against the corresponding
+#' \link{tripmats} matrices with the function
+#' \code{bikedata::bike_match_matrices}.
+#' 
+#' @name distmats
+#' @docType data
+NULL
+
+#' tripmats
+#' 
+#' Station-to-station trip matrices between bicycle hire stations for all cities
+#' of the \pkg{bikedata} package, calculated with the \code{bike_tripmat}
+#' function. These matrices have been reconciled against the corresponding
+#' \link{distmats} matrices with the function
+#' \code{bikedata::bike_match_matrices}.
+#' 
+#' @name tripmats
+#' @docType data
+NULL
