@@ -29,17 +29,12 @@ knitr::opts_chunk$set(
 [![Project Status: WIP](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#WIP)
 
 
-An R package for analysis of distance decay functions.
+An R package to use output from the [`bikedata`
+package](https://github.com/ropensci/bikedata) to analyse distance decay
+functions. The package mostly relies on two corresponding matrices of numbers of
+trips and distances between all pairs of stations. These data are bundled
+internally as `tripmats` and `distmats`, respectively.
 
-Input: Two square matrices; one of relationships between pairs of locations and
-one of corresponding distances.
-
-Output: Distance decay functions for each location, quantified as either
-covariance or mutual information coefficients.
-
-The package is primarily intended to analyse ``flow'' matrices which quantify
-flows between locations, quantifed in such terms as rates or densities or
-movement or exchange.
 
 ### Installation
 
