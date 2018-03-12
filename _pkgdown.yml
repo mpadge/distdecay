@@ -7,23 +7,27 @@ templates:
 reference:
   - title: Package doc
     contents:
-    - distdecay-package
+      - distdecay-package
   - title: The Main Functions
     contents:
-    - dd_compare_models
-    - dd_cov
-    - dd_decay_fns
-    - dd_fit_stations
-    - dd_get_data_dir
-    - dd_get_distmat
-    - dd_get_tripdistmats
-    - dd_get_tripmat
-    - dd_mi
-    - dd_plot
-    - dd_plot_all
-    - dd_set_data_dir
-    - distmat_g
-    - width_ratios
+      - dd_compare_models
+      - dd_cov
+      - dd_decay_fns
+      - dd_fit_stations
+      - dd_get_data_dir
+      - dd_get_distmat
+      - dd_get_tripdistmats
+      - dd_get_tripmat
+      - dd_mi
+      - dd_plot
+      - dd_plot_all
+      - dd_set_data_dir
+      - distmat_g
+      - width_ratios
+  - title: Package Data
+    contents:
+      - distmats
+      - tripmats
 
 articles:
   - title: The distdecay package
