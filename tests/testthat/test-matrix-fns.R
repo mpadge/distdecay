@@ -20,8 +20,8 @@ test_that ('cov matrix', {
                cm <- dd_cov (city = city)
                expect_is (cm, "matrix")
                tm <- tripmats [[city]]
-               expect_equal (rownames (tm), rownames (m))
-               expect_equal (colnames (tm), colnames (m))
+               expect_equal (rownames (tm), rownames (cm))
+               expect_equal (colnames (tm), colnames (cm))
 })
 
 test_that ('MI matrix', {
