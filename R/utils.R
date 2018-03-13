@@ -61,9 +61,6 @@ full_city_name <- function (ci)
 
 chk_city <- function (city)
 {
-    env <- new.env ()
-    utils::data ('distmats', envir = env)
-
     if (!city %in% names (distmats))
         stop (city, " not in distmats; available cities are ",
               names (distmats))
