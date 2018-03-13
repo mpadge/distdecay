@@ -58,3 +58,10 @@ full_city_name <- function (ci)
     cities <- c ('ny', 'bo', 'ch', 'dc', 'la', 'lo', 'ph')
     full_names [match (ci, cities)]
 }
+
+chk_city <- function (city)
+{
+    if (!city %in% names (distmats))
+        stop (city, " not in distmats; available cities are ",
+              names (distmats))
+}

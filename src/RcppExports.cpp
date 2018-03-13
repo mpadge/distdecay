@@ -6,6 +6,18 @@
 
 using namespace Rcpp;
 
+// rcpp_clusters
+Rcpp::IntegerVector rcpp_clusters(arma::mat dmat, arma::mat cmat);
+RcppExport SEXP _distdecay_rcpp_clusters(SEXP dmatSEXP, SEXP cmatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type dmat(dmatSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cmat(cmatSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_clusters(dmat, cmat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_calc_cov
 Rcpp::NumericMatrix rcpp_calc_cov(arma::mat tmat);
 RcppExport SEXP _distdecay_rcpp_calc_cov(SEXP tmatSEXP) {

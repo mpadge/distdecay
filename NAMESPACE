@@ -2,6 +2,7 @@
 
 export(dd_compare_models)
 export(dd_cov)
+export(dd_cov_clusters)
 export(dd_decay_fns)
 export(dd_fit_stations)
 export(dd_get_data_dir)

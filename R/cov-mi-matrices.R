@@ -33,9 +33,7 @@
 dd_cov <- function (city, lower = 0, upper = 1, osm = TRUE,
                     neutral = FALSE, k = NULL)
 {
-    if (!city %in% names (distmats))
-        stop (city, " not in distmats; available cities are ",
-              names (distmats))
+    chk_city (city)
 
     distmat <- distmats [[city]]
     tripmat <- tripmats [[city]]
