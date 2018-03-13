@@ -5,6 +5,17 @@
 #'
 #' Calculate clusters from covariance and distance matrices.
 #' 
+#' while not all allocated:
+#'     i = station with highest covariance
+#'     j = corresponding station
+#'     if i unallocated:
+#'         if j allocated:
+#'             cluster (i) <- cluster (j)
+#'         else:
+#'             allocate i to new cluster
+#'     cov (i, j) = 0.0
+#'     cmax (i) = max (cov (i, ))
+#' 
 #' @noRd
 rcpp_clusters <- function(dmat, cmat) {
     .Call(`_distdecay_rcpp_clusters`, dmat, cmat)
