@@ -23,18 +23,19 @@ dd_get_tripdistmats <- function (bikedb)
         stop ("bikedb not found; please set directory with dd_set_data_dir")
 
     message ("\nExtracting Trip and Distance matrices ...")
-    tripmats <- distmats <- list ()
+    tripmats_in <- distmats_in <- list ()
+    cities <- c ('ny', 'bo', 'ch', 'dc', 'la', 'lo', 'ph')
     for (ci in cities)
     {
         message ("----------", ci, "----------")
         tm <- bike_tripmat (bikedb = bikedb, city = ci,
                             standardise = TRUE, quiet = FALSE)
         dm <- bike_distmat (bikedb = bikedb, city = ci, quiet = FALSE)
-        tdm <- match_matrices (tm, dm)
-        tripmats [[ci]] <- tdm$trip
-        distmats [[ci]] <- tdm$dist
+        tdm <- bike_match_matrices (tm, dm)
+        tripmats_in [[ci]] <- tdm$trip
+        distmats_in [[ci]] <- tdm$dist
     }
-    return (list (tripmats = tripmats, distmats = distmats))
+    return (list (tripmats = tripmats_in, distmats = distmats_in))
 }
 
 
@@ -49,7 +50,7 @@ dd_get_vecs <- function (city, from = TRUE, mi = FALSE)
         n <- dd_mi (city)
     else
         n <- dd_cov (city)
-    d <- dd_get_distmat (city)
+    d <- distmats [[city]]
 
     if (from)
     {

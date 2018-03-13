@@ -200,7 +200,8 @@ dd_fit_stations <- function (city, from = TRUE, lower = 0, upper = 1,
         cv <- dd_cov (city = ci, lower = lower, upper = upper)
 
     cv [cv < 0] <- NA
-    dists <- dd_get_distmat (city = ci, osm = osm)
+    #dists <- dd_get_distmat (city = ci, osm = osm)
+    dists <- distmats [[city]] # TODO: Re-implement osm option there!
     if (!identical (rownames (dists), rownames (cv))) # generally for !osm
     {
         nms <- intersect (rownames (dists), rownames (cv))
@@ -310,15 +311,21 @@ dd_fit_stations <- function (city, from = TRUE, lower = 0, upper = 1,
 #' @export
 dd_decay_fns <- function (city, from = TRUE)
 {
-    mats1 <- dd_get_tripdistmats (city = city, osm = TRUE)
-    n <- seq (nrow (mats1$trip))
-    res1 <- lapply (n, function (i) dd_fit_expmod (mats1, i = i, from = from))
-    res1 <- do.call (rbind, res1)
+    # TODO: This no longer works at all! Fix by re-implementing dd_fit_stations
+    # for OSM = T/F.
+    chk_city (city)
+    #mats1 <- dd_get_tripdistmats (city = city, osm = TRUE)
+    tmat <- tripmats [[city]]
+    n <- seq (nrow (tmat))
+    #res1 <- lapply (n, function (i) dd_fit_stations (city, i = i, from = from))
+    #res1 <- do.call (rbind, res1)
+    res1 <- dd_fit_stations (city, from = from)
 
-    mats2 <- dd_get_tripdistmats (city = city, osm = FALSE)
-    n <- seq (nrow (mats2$trip))
-    res2 <- lapply (n, function (i) dd_fit_expmod (mats2, i = i, from = from))
-    res2 <- do.call (rbind, res2)
+    #mats2 <- dd_get_tripdistmats (city = city, osm = FALSE)
+    #n <- seq (nrow (mats2$trip))
+    #res2 <- lapply (n, function (i) dd_fit_stations (city, i = i, from = from))
+    #res2 <- do.call (rbind, res2)
+    res2 <- dd_fit_stations (city, from = from)
 
     nms <- intersect (res1$id, res2$id)
     res1 <- res1 [match (nms, res1$id), ]
@@ -359,8 +366,9 @@ width_ratios <- function (city)
         rss [i] <- mean (x_osm$ss, na.rm = TRUE) /
             mean (x_str$ss, na.rm = TRUE)
         # Then convert deciles to distance estimates
-        mats <- dd_get_tripdistmats (city, osm = TRUE)
-        indx <- dist_thresholds (mats, lower = lo, upper = hi)
+        #mats <- dd_get_tripdistmats (city, osm = TRUE)
+        dmat_i <- distmats [[city]]
+        indx <- dist_thresholds (dmat_i, lower = lo, upper = hi)
         for (j in seq (indx))
             if (length (indx [[j]]) > 0)
                 mats$dist [j, indx [[j]]] <- mats$dist [indx [[j]], j] <- 0

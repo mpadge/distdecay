@@ -44,7 +44,7 @@ dd_cov <- function (city, lower = 0, upper = 1, osm = TRUE,
 
     if (lower > 0 | upper < 1)
     {
-        indx <- dist_thresholds (dists, lower, upper)
+        indx <- dist_thresholds (distmat, lower, upper)
         for (i in seq (indx))
             if (length (indx [[i]]) > 0)
                 tripmat [i, indx [[i]]] <- tripmat [indx [[i]], i] <- 0

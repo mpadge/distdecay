@@ -7,6 +7,11 @@
     toset <- !(names (op.distdecay) %in% names (op))
     if (any (toset))
         options (op.distdecay [toset])
+
+    # make data set names global to avoid CHECK notes
+    utils::globalVariables ("distmats")
+    utils::globalVariables ("tripmats")
+
     invisible ()
 }
 
