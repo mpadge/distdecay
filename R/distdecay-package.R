@@ -12,13 +12,21 @@
 #' @docType package
 #' @author Mark Padgham
 #' @importFrom bikedata bike_match_matrices bike_distmat bike_tripmat
+#' @importFrom dplyr distinct filter inner_join mutate select
 #' @importFrom ggplot2 facet_wrap geom_smooth ggplot guides 
 #' @importFrom ggplot2 scale_fill_gradientn scale_x_log10 scale_y_log10 
 #' @importFrom ggplot2 stat_binhex xlab ylab 
+#' @importFrom ggthemes theme_solarized
 #' @importFrom graphics legend lines locator title
+#' @importFrom grDevices rainbow
 #' @importFrom jsonlite fromJSON
+#' @importFrom magrittr %>% %<>%
+#' @importFrom mapview addFeatures mapview 
 #' @importFrom Rcpp evalCpp
+#' @importFrom sf st_crs st_polygon st_point st_sfc st_sf
+#' @importFrom spatstat convexhull ppp
 #' @importFrom stats AIC lm median nls optimise predict sd t.test
+#' @importFrom tibble tibble
 #' @importFrom utils globalVariables setTxtProgressBar txtProgressBar
 #' @useDynLib distdecay, .registration = TRUE
 NULL

@@ -96,3 +96,106 @@ dd_plot_all <- function (from = TRUE, mi = FALSE, smoother = FALSE)
     print (g)
     invisible (g)
 }
+
+#' dd_cluster_hulls
+#'
+#' Calculate convex hulls around clusters, mostly cribbed from
+#' osmplotr/R/add-osm-groups.R
+#'
+#' @param stns tibble of station coordinates plus cluster numbers
+#' @return tibble of (id, x, y), where the coordinates trace the convex hulls
+#' for each cluster id
+#' @noRd
+dd_cluster_hulls <- function (stns)
+{
+    if (!"cl" %in% names (stns))
+        stop ("stns has no cl column to identify clusters")
+
+    bdry <- list ()
+    for (i in seq (unique (stns$cl)))
+    {
+        indx <- which (stns$cl == i) # col = group membership
+        if (length (indx) > 1)
+        {
+            x <- stns$longitude [indx]
+            y <- stns$latitude [indx]
+            indx <- which (!duplicated (cbind (x, y)))
+            x <- x [indx]
+            y <- y [indx]
+            xy2 <- spatstat::ppp (x, y, xrange = range (x),
+                                  yrange = range (y))
+            ch <- spatstat::convexhull (xy2)
+            bdry [[i]] <- cbind (ch$bdry[[1]]$x, ch$bdry[[1]]$y)
+        }
+        bdry [[i]] <- cbind (i, bdry [[i]])
+    }
+    bdry <- data.frame (do.call (rbind, bdry))
+    names (bdry) <- c ("id", "x", "y")
+    return (bdry)
+}
+
+#' dd_plot_clusters
+#'
+#' Plot the results of the \link{dd_cov_clusters} function
+#'
+#' @param cl Tibble of station data and cluster numbers obtained from
+#' \link{dd_cluster_stations}
+#' @param interactive If \code{FALSE}, produce a static \pkg{ggplot2} object,
+#' otherwise an interactive map via \pkg{mapview}.
+#'
+#' @export
+dd_plot_clusters <- function (cl, interactive = TRUE)
+{
+    # suppress no visible binding notes:
+    stns <- x <- y <- id <- longitude <- latitude <- . <- NULL
+
+    bdry <- dd_cluster_hulls (cl)
+
+    cols <- rainbow (length (unique (stns$cl)))
+    if (!interactive)
+    {
+        hull_aes <- ggplot2::aes (x = x, y = y, group = id)
+        hull_width <- 0.5
+        m <- ggplot2::ggplot (stns, ggplot2::aes (x = longitude,
+                                                  y = latitude,
+                                                  colour = cols [cl])) +
+            ggplot2::geom_point (show.legend = FALSE) +
+            ggplot2::geom_polygon (data = bdry,
+                                   mapping = hull_aes,
+                                   colour = cols [bdry$id],
+                                   fill = "transparent",
+                                   size = hull_width) +
+            ggthemes::theme_solarized ()
+    } else
+    {
+        xy <- stns %>%
+            select (longitude, latitude) %>%
+            as.matrix () %>%
+            split (., seq (nrow (.))) %>%
+            lapply (sf::st_point) %>%
+            sf::st_sfc () %>%
+            sf::st_sf ()
+        sf::st_crs (xy) <- 4326
+        xy$col <- cols [stns$cl]
+        # hulls to sf:
+        grps <- sort (unique (bdry$id))
+        polys <- list ()
+        for (g in grps)
+        {
+            pg <- bdry %>% filter (id == g) %>% select (x, y) %>% as.matrix ()
+            pg <- rbind (pg, pg [1, ])
+            polys <- c (polys, list (sf::st_polygon (list (pg))))
+        }
+        polys <- sf::st_sfc (polys) %>% sf::st_sf ()
+        sf::st_crs (polys) <- 4326
+        polys$col <- cols
+
+        m <- mapview::mapview (polys, color = polys$col,
+                 col.regions = polys$col, alpha.regions = 0.1) %>%
+                mapview::addFeatures (xy, color = xy$col, radius = 2)
+    }
+
+    print (m)
+    invisible (m)
+}
+

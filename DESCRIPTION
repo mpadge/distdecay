@@ -10,10 +10,17 @@ Depends:
 License: GPL-3
 Imports:
     bikedata,
+    dplyr,
     ggplot2,
+    ggthemes,
     jsonlite,
+    magrittr,
+    mapview,
     Rcpp (>= 0.12.6),
-    RcppArmadillo
+    RcppArmadillo,
+    sf,
+    spatstat,
+    tibble
 Suggests:
     devtools,
     knitr,
