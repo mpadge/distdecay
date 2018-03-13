@@ -146,17 +146,14 @@ dd_cluster_hulls <- function (stns)
 #' @export
 dd_plot_clusters <- function (cl, interactive = TRUE)
 {
-    # suppress no visible binding notes:
-    stns <- x <- y <- id <- longitude <- latitude <- . <- NULL
-
     bdry <- dd_cluster_hulls (cl)
 
-    cols <- rainbow (length (unique (stns$cl)))
+    cols <- rainbow (length (unique (cl$cl)))
     if (!interactive)
     {
         hull_aes <- ggplot2::aes (x = x, y = y, group = id)
         hull_width <- 0.5
-        m <- ggplot2::ggplot (stns, ggplot2::aes (x = longitude,
+        m <- ggplot2::ggplot (cl, ggplot2::aes (x = longitude,
                                                   y = latitude,
                                                   colour = cols [cl])) +
             ggplot2::geom_point (show.legend = FALSE) +
@@ -168,25 +165,29 @@ dd_plot_clusters <- function (cl, interactive = TRUE)
             ggthemes::theme_solarized ()
     } else
     {
-        xy <- stns %>%
-            select (longitude, latitude) %>%
+        xy <- cl %>%
+            dplyr::select (longitude, latitude) %>%
             as.matrix () %>%
             split (., seq (nrow (.))) %>%
             lapply (sf::st_point) %>%
             sf::st_sfc () %>%
             sf::st_sf ()
         sf::st_crs (xy) <- 4326
-        xy$col <- cols [stns$cl]
+        xy$col <- cols [cl$cl]
         # hulls to sf:
         grps <- sort (unique (bdry$id))
         polys <- list ()
         for (g in grps)
         {
-            pg <- bdry %>% filter (id == g) %>% select (x, y) %>% as.matrix ()
+            pg <- bdry %>%
+                filter (id == g) %>%
+                select (x, y) %>%
+                as.matrix ()
             pg <- rbind (pg, pg [1, ])
             polys <- c (polys, list (sf::st_polygon (list (pg))))
         }
-        polys <- sf::st_sfc (polys) %>% sf::st_sf ()
+        polys <- sf::st_sfc (polys) %>%
+            sf::st_sf ()
         sf::st_crs (polys) <- 4326
         polys$col <- cols
 

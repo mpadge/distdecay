@@ -36,9 +36,6 @@ dd_cov_clusters <- function (city = "nyc")
 #' @export
 dd_cluster_stations <- function (cl, city, stns, min_size = 3)
 {
-    # suppress no visible binding notes:
-    stn_id <- longitude <- latitude <- NULL
-
     cl <- tibble::tibble (stn_id = names (cl), cl = cl)
     stns %<>% dplyr::select (stn_id, longitude, latitude) %>%
         dplyr::distinct (stn_id, .keep_all = TRUE) %>%
